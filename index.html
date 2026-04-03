@@ -19,15 +19,16 @@
 
     overflow-x: hidden;
   }
+
   .card {
     background: rgba(255,255,255,0.95);
-    padding: 40px;
-    border-radius: 20px;
+    padding: 50px;
+    border-radius: 25px;
     text-align: center;
 
-    width: min(740px, 100%);  /* BETTER WIDTH CONTROL */
+    width: min(800px, 100%);  /* INCREASED WIDTH */
 
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
     animation: fadeIn 0.8s;
   }
 
@@ -37,9 +38,9 @@
   }
 
   h1 {
-    font-size: 26px;
+    font-size: 28px;
     line-height: 1.4;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
   }
 
   button {
@@ -70,29 +71,29 @@
 
   #result {
     display: none;
-    padding: 40px;
+    padding: 50px;
     background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    border-radius: 25px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     animation: fadeIn 1s;
     text-align: center;
   }
 
   #result h1 {
     color: #4caf50;
-    font-size:28px;
+    font-size:32px;
   }
 
   #result img {
-    margin-top:20px;
-    width:220px;
-    border-radius:15px;
+    margin-top:25px;
+    width:300px;   /* BIGGER IMAGE */
+    border-radius:20px;
   }
 
   #button-zone {
     position: relative;
     height: 240px;
-    margin-top: 20px;
+    margin-top: 25px;
     overflow: hidden;
   }
 </style>
@@ -173,6 +174,17 @@ function growYes(){
   yesBtn.style.transform=`scale(${yesScale})`;
 }
 
+// Reset Yes/No for each new yesno question
+function resetYesNoButtons(){
+  yesScale = 1;
+  yesBtn.style.transform = `scale(${yesScale})`;
+
+  yesBtn.style.left = "20%";
+  yesBtn.style.top = "0";
+  noBtn.style.left = "60%";
+  noBtn.style.top = "0";
+}
+
 zone.addEventListener("pointermove", e=>{
   const b=noBtn.getBoundingClientRect();
   const d=Math.hypot((b.left+b.width/2)-e.clientX,(b.top+b.height/2)-e.clientY);
@@ -201,6 +213,7 @@ function nextStep(){
         zone.appendChild(btn);
       });
     } else {
+      resetYesNoButtons();   // RESET buttons for yesno
       zone.appendChild(yesBtn);
       zone.appendChild(noBtn);
     }
