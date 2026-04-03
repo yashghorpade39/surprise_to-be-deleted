@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Play this game for me?</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(120deg, #ff9a9e, #fad0c4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin:0;
+    overflow: hidden;
+  }
+  .card {
+    background: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    animation: fadeIn 0.8s;
+  }
+  @keyframes fadeIn {from {opacity:0; transform:scale(0.95);} to {opacity:1; transform:scale(1);} }
+
+  h1 { font-size: 22px; margin-bottom: 20px; }
+  button {
+    margin: 10px;
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    background: linear-gradient(45deg, #ff758c, #ff7eb3);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+    position: absolute;
+  }
+  button:hover { transform: scale(1.1); }
+
+  .hint { font-size: 13px; color:#555; margin-top:10px; }
+
+  #result {
+    display: none;
+    padding: 40px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    animation: fadeIn 1s;
+  }
+  #result h1 { color: #4caf50; font-size:28px; }
+  #result img { margin-top:20px; width:220px; border-radius:15px; }
+
+  #button-zone {
+    position: relative;
+    height: 150px;
+    margin-top:20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="gameCard">
+  <h1 id="question">Hi honey, can you please play this game for me?</h1>
+  <div id="button-zone">
+    <button id="yesBtn" style="left:20%;">Yes</button>
+    <button id="noBtn" style="left:60%;">No</button>
+  </div>
+  <div class="hint" id="hint">“No” seems shy 😈</div>
+</div>
+
+<div id="result">
+  <h1>🎉 Surprise! 🎉</h1>
+  <p>JUDIIIII it is!</p>
+  <img src="images/surprise image.png" alt="hehe">
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script>
+const steps = [
+  { type:'yesno', text:"Hi Babde, can you please play this game for me :(?" },
+  { type:'yesno', text:"Do you remember the first time we met?" },
+  { type:'choice', text:"Which movie did we watch together first?", options:["Tees maar khan","De dana dan","Kick","Hera pheri"] },
+  { type:'choice', text:"Where did we go for our first date?", options:["Dagdusheth","Cafe Highmark","Mall","Theatre"] },
+  { type:'yesno', text:"Do you remember that rainy day we stayed home?" },
+  { type:'choice', text:"Pick a dessert you like from these:", options:["Chocolate cake","Ice cream","Donuts","Macarons"] },
+  { type:'yesno', text:"I have a question… I really like you. Please Please will you be my Valentine :)?" }
+];
+
+let step = 0;
+const questionEl = document.getElementById("question");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const zone = document.getElementById("button-zone");
+const gameCard = document.getElementById("gameCard");
+const result = document.getElementById("result");
+
+// Move No button randomly
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+function moveNo(px,py){
+  const z = zone.getBoundingClientRect();
+  const b = noBtn.getBoundingClientRect();
+  let dx = (b.left+b.width/2)-px;
+  let dy = (b.top+b.height/2)-py;
+  let mag = Math.hypot(dx,dy)||1; dx/=mag; dy/=mag;
+  let newLeft = (b.left-z.left)+dx*150;
+  let newTop = (b.top-z.top)+dy*150;
+  newLeft = clamp(newLeft,0,z.width-b.width);
+  newTop = clamp(newTop,0,z.height-b.height);
+  noBtn.style.left = newLeft+"px";
+  noBtn.style.top = newTop+"px";
+  growYes();
+}
+
+// Yes button grows
+let yesScale=1;
+function growYes(){ yesScale=Math.min(2.2,yesScale+0.1); yesBtn.style.transform=`scale(${yesScale})`; }
+
+zone.addEventListener("pointermove", e=>{
+  const b=noBtn.getBoundingClientRect();
+  const d=Math.hypot((b.left+b.width/2)-e.clientX,(b.top+b.height/2)-e.clientY);
+  if(d<140) moveNo(e.clientX,e.clientY);
+});
+noBtn.addEventListener("click",e=>e.preventDefault());
+
+// Next question
+function nextStep(){
+  step++;
+  if(step<steps.length){
+    const current = steps[step];
+    questionEl.textContent = current.text;
+    if(current.type==='choice'){
+      yesBtn.style.display='none';
+      noBtn.style.display='none';
+      zone.innerHTML='';
+      current.options.forEach(opt=>{
+        const btn = document.createElement('button');
+        btn.textContent=opt;
+        btn.onclick=nextStep;
+        btn.style.position='static';
+        zone.appendChild(btn);
+      });
+    }else{
+      yesBtn.style.display='inline-block';
+      noBtn.style.display='inline-block';
+      zone.innerHTML='';
+      zone.appendChild(yesBtn);
+      zone.appendChild(noBtn);
+    }
+  }else{
+    gameCard.style.display='none';
+    result.style.display='block';
+    confetti();
+  }
+}
+
+// Yes click
+yesBtn.addEventListener("click", nextStep);
+
+// Confetti effect
+const confettiCanvas = document.getElementById("confettiCanvas");
+confettiCanvas.width=window.innerWidth;
+confettiCanvas.height=window.innerHeight;
+const confettiInstance = confetti.create(confettiCanvas,{resize:true,useWorker:true});
+function confetti(){
+  const end = Date.now()+1600;
+  (function frame(){
+    confettiInstance({particleCount:10,spread:90,startVelocity:45,origin:{x:Math.random(),y:Math.random()*0.3}});
+    if(Date.now()<end) requestAnimationFrame(frame);
+  })();
+  setTimeout(()=>confettiInstance({particleCount:300,spread:140,startVelocity:60,origin:{x:0.5,y:0.55}}),300);
+}
+</script>
+</body>
+</html>
