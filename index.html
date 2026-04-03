@@ -9,21 +9,28 @@
   body {
     font-family: 'Comic Sans MS', cursive, sans-serif;
     background: linear-gradient(120deg, #ff9a9e, #fad0c4);
+
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+
+    min-height: 100vh;
     margin: 0;
-    padding: 20px; /* FIX */
+    padding: 20px;
+
+    overflow-x: hidden;
   }
 
   .card {
     background: rgba(255,255,255,0.95);
-    padding: 40px; /* BIGGER */
+    padding: 40px;
     border-radius: 20px;
     text-align: center;
-    width: 95%;
-    max-width: 650px; /* BIGGER */
+
+    width: 100%;
+    max-width: 650px;
+    margin: auto;
+
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     animation: fadeIn 0.8s;
   }
@@ -34,7 +41,7 @@
   }
 
   h1 {
-    font-size: 26px; /* BIGGER */
+    font-size: 26px;
     line-height: 1.4;
     margin-bottom: 20px;
   }
@@ -71,6 +78,7 @@
     border-radius: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     animation: fadeIn 1s;
+    text-align: center;
   }
 
   #result h1 {
@@ -88,7 +96,7 @@
     position: relative;
     height: 180px;
     margin-top: 20px;
-    overflow: hidden; /* FIX */
+    overflow: hidden;
   }
 </style>
 </head>
@@ -211,8 +219,8 @@ yesBtn.addEventListener("click", nextStep);
 
 // Confetti
 const confettiCanvas = document.getElementById("confettiCanvas");
-confettiCanvas.width=window.innerWidth;
-confettiCanvas.height=window.innerHeight;
+confettiCanvas.width = window.innerWidth;
+confettiCanvas.height = window.innerHeight;
 
 const confettiInstance = confetti.create(confettiCanvas,{resize:true,useWorker:true});
 
