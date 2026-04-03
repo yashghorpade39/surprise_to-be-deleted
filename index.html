@@ -10,9 +10,8 @@
     font-family: 'Comic Sans MS', cursive, sans-serif;
     background: linear-gradient(120deg, #ff9a9e, #fad0c4);
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    place-items: center;   /* PERFECT CENTER */
 
     min-height: 100vh;
     margin: 0;
@@ -20,16 +19,13 @@
 
     overflow-x: hidden;
   }
-
   .card {
     background: rgba(255,255,255,0.95);
     padding: 40px;
     border-radius: 20px;
     text-align: center;
 
-    width: 100%;
-    max-width: 650px;
-    margin: auto;
+    width: min(650px, 100%);  /* BETTER WIDTH CONTROL */
 
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     animation: fadeIn 0.8s;
