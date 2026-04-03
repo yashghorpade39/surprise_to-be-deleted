@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Play this game for me?</title>
+
 <style>
   body {
     font-family: 'Comic Sans MS', cursive, sans-serif;
@@ -12,22 +13,32 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin:0;
-    overflow: hidden;
+    margin: 0;
+    padding: 20px; /* FIX */
   }
+
   .card {
     background: rgba(255,255,255,0.95);
-    padding: 30px;
+    padding: 40px; /* BIGGER */
     border-radius: 20px;
     text-align: center;
-    width: 90%;
-    max-width: 500px;
+    width: 95%;
+    max-width: 650px; /* BIGGER */
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     animation: fadeIn 0.8s;
   }
-  @keyframes fadeIn {from {opacity:0; transform:scale(0.95);} to {opacity:1; transform:scale(1);} }
 
-  h1 { font-size: 22px; margin-bottom: 20px; }
+  @keyframes fadeIn {
+    from {opacity:0; transform:scale(0.95);}
+    to {opacity:1; transform:scale(1);}
+  }
+
+  h1 {
+    font-size: 26px; /* BIGGER */
+    line-height: 1.4;
+    margin-bottom: 20px;
+  }
+
   button {
     margin: 10px;
     padding: 12px 25px;
@@ -42,9 +53,16 @@
     box-shadow: 0 5px 12px rgba(0,0,0,0.25);
     position: absolute;
   }
-  button:hover { transform: scale(1.1); }
 
-  .hint { font-size: 13px; color:#555; margin-top:10px; }
+  button:hover {
+    transform: scale(1.1);
+  }
+
+  .hint {
+    font-size: 13px;
+    color:#555;
+    margin-top:10px;
+  }
 
   #result {
     display: none;
@@ -54,25 +72,38 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     animation: fadeIn 1s;
   }
-  #result h1 { color: #4caf50; font-size:28px; }
-  #result img { margin-top:20px; width:220px; border-radius:15px; }
+
+  #result h1 {
+    color: #4caf50;
+    font-size:28px;
+  }
+
+  #result img {
+    margin-top:20px;
+    width:220px;
+    border-radius:15px;
+  }
 
   #button-zone {
     position: relative;
-    height: 150px;
-    margin-top:20px;
+    height: 180px;
+    margin-top: 20px;
+    overflow: hidden; /* FIX */
   }
 </style>
 </head>
+
 <body>
 
 <div class="card" id="gameCard">
   <h1 id="question">Hi honey, can you please play this game for me?</h1>
+
   <div id="button-zone">
-    <button id="yesBtn" style="left:20%;">Yes</button>
-    <button id="noBtn" style="left:60%;">No</button>
+    <button id="yesBtn" style="left:25%;">Yes</button>
+    <button id="noBtn" style="left:55%;">No</button>
   </div>
-  <div class="hint" id="hint">“No” seems shy 😈</div>
+
+  <div class="hint">“No” seems shy 😈</div>
 </div>
 
 <div id="result">
@@ -84,6 +115,7 @@
 <canvas id="confettiCanvas"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
 <script>
 const steps = [
   { type:'yesno', text:"Hi Babde, can you please play this game for me :(?" },
@@ -96,6 +128,7 @@ const steps = [
 ];
 
 let step = 0;
+
 const questionEl = document.getElementById("question");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
@@ -103,81 +136,110 @@ const zone = document.getElementById("button-zone");
 const gameCard = document.getElementById("gameCard");
 const result = document.getElementById("result");
 
-// Move No button randomly
+// Move No button
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+
 function moveNo(px,py){
   const z = zone.getBoundingClientRect();
   const b = noBtn.getBoundingClientRect();
+
   let dx = (b.left+b.width/2)-px;
   let dy = (b.top+b.height/2)-py;
-  let mag = Math.hypot(dx,dy)||1; dx/=mag; dy/=mag;
+
+  let mag = Math.hypot(dx,dy)||1;
+  dx/=mag; dy/=mag;
+
   let newLeft = (b.left-z.left)+dx*150;
   let newTop = (b.top-z.top)+dy*150;
+
   newLeft = clamp(newLeft,0,z.width-b.width);
   newTop = clamp(newTop,0,z.height-b.height);
+
   noBtn.style.left = newLeft+"px";
   noBtn.style.top = newTop+"px";
+
   growYes();
 }
 
-// Yes button grows
+// Yes grows
 let yesScale=1;
-function growYes(){ yesScale=Math.min(2.2,yesScale+0.1); yesBtn.style.transform=`scale(${yesScale})`; }
+function growYes(){
+  yesScale=Math.min(2.2,yesScale+0.1);
+  yesBtn.style.transform=`scale(${yesScale})`;
+}
 
 zone.addEventListener("pointermove", e=>{
   const b=noBtn.getBoundingClientRect();
   const d=Math.hypot((b.left+b.width/2)-e.clientX,(b.top+b.height/2)-e.clientY);
   if(d<140) moveNo(e.clientX,e.clientY);
 });
+
 noBtn.addEventListener("click",e=>e.preventDefault());
 
-// Next question
+// Next step
 function nextStep(){
   step++;
+
   if(step<steps.length){
     const current = steps[step];
     questionEl.textContent = current.text;
+
+    zone.innerHTML='';
+
     if(current.type==='choice'){
-      yesBtn.style.display='none';
-      noBtn.style.display='none';
-      zone.innerHTML='';
       current.options.forEach(opt=>{
         const btn = document.createElement('button');
-        btn.textContent=opt;
-        btn.onclick=nextStep;
+        btn.textContent = opt;
+        btn.onclick = nextStep;
         btn.style.position='static';
+        btn.style.margin='8px';
         zone.appendChild(btn);
       });
-    }else{
-      yesBtn.style.display='inline-block';
-      noBtn.style.display='inline-block';
-      zone.innerHTML='';
+    } else {
       zone.appendChild(yesBtn);
       zone.appendChild(noBtn);
     }
-  }else{
+
+  } else {
     gameCard.style.display='none';
     result.style.display='block';
     confetti();
   }
 }
 
-// Yes click
 yesBtn.addEventListener("click", nextStep);
 
-// Confetti effect
+// Confetti
 const confettiCanvas = document.getElementById("confettiCanvas");
 confettiCanvas.width=window.innerWidth;
 confettiCanvas.height=window.innerHeight;
+
 const confettiInstance = confetti.create(confettiCanvas,{resize:true,useWorker:true});
+
 function confetti(){
   const end = Date.now()+1600;
+
   (function frame(){
-    confettiInstance({particleCount:10,spread:90,startVelocity:45,origin:{x:Math.random(),y:Math.random()*0.3}});
+    confettiInstance({
+      particleCount:10,
+      spread:90,
+      startVelocity:45,
+      origin:{x:Math.random(),y:Math.random()*0.3}
+    });
+
     if(Date.now()<end) requestAnimationFrame(frame);
   })();
-  setTimeout(()=>confettiInstance({particleCount:300,spread:140,startVelocity:60,origin:{x:0.5,y:0.55}}),300);
+
+  setTimeout(()=>{
+    confettiInstance({
+      particleCount:300,
+      spread:140,
+      startVelocity:60,
+      origin:{x:0.5,y:0.55}
+    });
+  },300);
 }
 </script>
+
 </body>
 </html>
